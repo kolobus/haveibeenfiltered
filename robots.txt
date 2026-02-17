@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://haveibeenfiltered.com/sitemap.xml

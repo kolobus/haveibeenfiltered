@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>haveibeenfiltered — Offline password breach checking</title>
+<meta name="description" content="Check passwords against 2 billion breached passwords offline using ribbon filters. npm package, zero dependencies, ~14µs per lookup.">
+<link rel="canonical" href="https://haveibeenfiltered.com">
+
+<!-- Open Graph -->
+<meta property="og:title" content="haveibeenfiltered — Offline password breach checking">
+<meta property="og:description" content="Check passwords against 2 billion breached passwords offline using ribbon filters. npm package, zero dependencies, ~14µs per lookup.">
+<meta property="og:url" content="https://haveibeenfiltered.com">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://haveibeenfiltered.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://haveibeenfiltered.com/og-image.png">
+<meta name="twitter:title" content="haveibeenfiltered — Offline password breach checking">
+<meta name="twitter:description" content="Check passwords against 2 billion breached passwords offline using ribbon filters. npm package, zero dependencies, ~14µs per lookup.">
+
+<!-- JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "haveibeenfiltered",
+  "description": "Offline password breach checking using ribbon filters. Check passwords against HIBP (2B+ passwords) locally with zero API calls.",
+  "url": "https://haveibeenfiltered.com",
+  "applicationCategory": "SecurityApplication",
+  "operatingSystem": "Any (Node.js >= 16)",
+  "license": "https://opensource.org/licenses/MIT",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --bg: #fff;
+  --fg: #111;
+  --fg-muted: #555;
+  --bg-code: #f5f5f5;
+  --border: #ddd;
+  --bg-table-head: #f0f0f0;
+  --bg-table-stripe: #fafafa;
+  --link: #0055aa;
+  --hero-bg: #1a2332;
+  --hero-fg: #e8edf3;
+  --hero-muted: #8899aa;
+  --hero-code-bg: #151d29;
+  --hero-code-border: #2a3a4e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a1a;
+    --fg: #e0e0e0;
+    --fg-muted: #999;
+    --bg-code: #2a2a2a;
+    --border: #444;
+    --bg-table-head: #2a2a2a;
+    --bg-table-stripe: #222;
+    --link: #6baaee;
+    --hero-bg: #111820;
+    --hero-fg: #d8dfe8;
+    --hero-muted: #6a7a8a;
+    --hero-code-bg: #0d1218;
+    --hero-code-border: #1e2a38;
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0 1rem;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+}
+
+h1 + p {
+  color: var(--fg-muted);
+  margin-top: 0;
+  font-size: 1.05rem;
+}
+
+/* Hero header */
+.hero-wrap {
+  background: var(--hero-bg);
+  color: var(--hero-fg);
+  margin: 0 -1rem;
+  padding: 0 1rem;
+}
+
+.hero {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3.5rem 0 2.5rem;
+}
+
+.hero h1 {
+  font-size: 2.4rem;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.5rem;
+}
+
+.hero .tagline {
+  color: var(--hero-muted);
+  font-size: 1.15rem;
+  margin: 0 0 1.5rem;
+  max-width: 480px;
+}
+
+.hero .stats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero .stats li {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero .stats .value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero .stats .label {
+  font-size: 0.8rem;
+  color: var(--hero-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hero .install-hint {
+  margin-top: 1.5rem;
+}
+
+.hero .install-hint pre {
+  display: inline-block;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  background: var(--hero-code-bg);
+  border: 1px solid var(--hero-code-border);
+  color: var(--hero-fg);
+}
+
+.hero-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.hero-links a {
+  color: var(--hero-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--hero-code-border);
+  padding-bottom: 1px;
+}
+
+.hero-links a:hover {
+  color: var(--hero-fg);
+  border-bottom-color: var(--hero-fg);
+}
+
+/* GitHub corner ribbon */
+.github-corner svg {
+  fill: var(--hero-fg);
+  color: var(--hero-bg);
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.github-corner:hover .octo-arm {
+  animation: octocat-wave 560ms ease-in-out;
+}
+
+@keyframes octocat-wave {
+  0%, 100% { transform: rotate(0); }
+  20%, 60% { transform: rotate(-25deg); }
+  40%, 80% { transform: rotate(10deg); }
+}
+
+@media (max-width: 500px) {
+  .github-corner:hover .octo-arm { animation: none; }
+  .github-corner .octo-arm { animation: octocat-wave 560ms ease-in-out; }
+  .hero h1 { font-size: 1.8rem; }
+  .hero .stats { gap: 1.2rem; }
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin-top: 2.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3rem;
+}
+
+h3 {
+  font-size: 1.1rem;
+  margin-top: 1.8rem;
+}
+
+a { color: var(--link); }
+
+pre {
+  background: var(--bg-code);
+  padding: 0.8rem 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9em;
+}
+
+p code, li code, td code {
+  background: var(--bg-code);
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9rem;
+  margin: 1rem 0;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+}
+
+th {
+  background: var(--bg-table-head);
+  font-weight: 600;
+}
+
+tr:nth-child(even) td {
+  background: var(--bg-table-stripe);
+}
+
+.sha256 {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.8em;
+  word-break: break-all;
+}
+
+svg text {
+  fill: var(--fg);
+}
+
+svg .box {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1.5;
+}
+
+svg .arrow {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1.5;
+  marker-end: url(#arrowhead);
+}
+
+svg .label {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 12px;
+}
+
+svg .note {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  fill: var(--fg-muted);
+}
+
+details {
+  margin: 0.75rem 0;
+}
+
+details summary {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+details p {
+  margin: 0.5rem 0 1rem 0;
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+  padding: 1.5rem 0;
+  color: var(--fg-muted);
+  font-size: 0.85rem;
+}
+
+footer a { color: var(--fg-muted); }
+
+footer nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+footer nav .nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+</style>
+</head>
+<body>
+
+<!-- GitHub corner ribbon -->
+<a href="https://github.com/kolobus/haveibeenfiltered" class="github-corner" aria-label="View source on GitHub">
+<svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true">
+<path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+<path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+<path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.1,141.5 141.1,141.6 Z" fill="currentColor"></path>
+</svg>
+</a>
+
+<div class="hero-wrap">
+<header class="hero">
+<h1>haveibeenfiltered</h1>
+<p class="tagline">Offline password breach checking using ribbon filters</p>
+<ul class="stats">
+  <li><span class="value">2B+</span><span class="label">passwords</span></li>
+  <li><span class="value">1.79 GB</span><span class="label">filter size</span></li>
+  <li><span class="value">~14 µs</span><span class="label">per check</span></li>
+  <li><span class="value">0</span><span class="label">dependencies</span></li>
+</ul>
+<div class="install-hint">
+<pre><code>npm install haveibeenfiltered</code></pre>
+</div>
+<nav class="hero-links">
+  <a href="https://github.com/kolobus/haveibeenfiltered">GitHub</a>
+  <a href="https://www.npmjs.com/package/haveibeenfiltered">npm</a>
+</nav>
+</header>
+</div>
+
+<main>
+
+<!-- What is this -->
+<section>
+<h2>What is this?</h2>
+<p>haveibeenfiltered is an npm package for checking passwords against breach datasets locally. It uses ribbon filters to compress 2 billion SHA-1 hashes from Have I Been Pwned into a 1.79 GB file with a 0.78% false positive rate and zero false negatives.</p>
+</section>
+
+<!-- Install & Usage -->
+<section>
+<h2>Install &amp; Usage</h2>
+
+<h3>Install</h3>
+<pre><code>npm install haveibeenfiltered</code></pre>
+
+<h3>Download the filter data</h3>
+<pre><code>npx haveibeenfiltered download</code></pre>
+
+<h3>Use in your app</h3>
+<pre><code>const hbf = require('haveibeenfiltered')
+
+const filter = await hbf.load()
+
+filter.check('password123')   // true  — breached
+filter.check('Tr0ub4dor&amp;3')   // false — not found
+
+filter.checkHash('5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8')  // true
+
+filter.close()  // release memory when done</code></pre>
+</section>
+
+<!-- How Ribbon Filters Work -->
+<section>
+<h2>How Ribbon Filters Work</h2>
+
+<p>A <a href="https://engineering.fb.com/2021/07/09/core-infra/ribbon-filter/">ribbon filter</a> is a probabilistic data structure for set membership testing, similar to a Bloom filter but roughly 20% more space-efficient. Given a set of keys, it stores compact fingerprints in a system of linear equations that can be solved via Gaussian elimination. Querying evaluates the system for a given key and compares the result to the expected fingerprint.</p>
+
+<h3>Query flow</h3>
+
+<svg viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ribbon filter query flow diagram">
+  <defs>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <!-- password -->
+  <rect class="box" x="10" y="30" width="80" height="32" rx="3"/>
+  <text class="label" x="50" y="51" text-anchor="middle">password</text>
+
+  <!-- arrow -->
+  <line class="arrow" x1="90" y1="46" x2="118" y2="46"/>
+
+  <!-- SHA-1 -->
+  <rect class="box" x="120" y="30" width="60" height="32" rx="3"/>
+  <text class="label" x="150" y="51" text-anchor="middle">SHA-1</text>
+
+  <!-- arrow to shard -->
+  <line class="arrow" x1="180" y1="40" x2="245" y2="40"/>
+  <text class="note" x="212" y="35">1st byte</text>
+
+  <!-- shard -->
+  <rect class="box" x="247" y="24" width="80" height="32" rx="3"/>
+  <text class="label" x="287" y="45" text-anchor="middle">shard</text>
+  <text class="note" x="287" y="72" text-anchor="middle">256 total</text>
+
+  <!-- arrow to MurmurHash3 -->
+  <line class="arrow" x1="180" y1="52" x2="245" y2="100"/>
+
+  <!-- MurmurHash3 -->
+  <rect class="box" x="247" y="84" width="120" height="32" rx="3"/>
+  <text class="label" x="307" y="105" text-anchor="middle">MurmurHash3</text>
+  <text class="note" x="307" y="132" text-anchor="middle">x64 128-bit, seeded</text>
+
+  <!-- outputs from MurmurHash3 -->
+  <line class="arrow" x1="367" y1="92" x2="410" y2="46"/>
+  <line class="arrow" x1="367" y1="100" x2="410" y2="100"/>
+  <line class="arrow" x1="367" y1="108" x2="410" y2="154"/>
+
+  <!-- start -->
+  <rect class="box" x="412" y="30" width="76" height="32" rx="3"/>
+  <text class="label" x="450" y="51" text-anchor="middle">start</text>
+
+  <!-- coefficient -->
+  <rect class="box" x="412" y="84" width="76" height="32" rx="3"/>
+  <text class="label" x="450" y="105" text-anchor="middle">coeff</text>
+  <text class="note" x="450" y="132" text-anchor="middle">64-bit</text>
+
+  <!-- fingerprint -->
+  <rect class="box" x="412" y="138" width="76" height="32" rx="3"/>
+  <text class="label" x="450" y="159" text-anchor="middle">fprint</text>
+  <text class="note" x="450" y="186" text-anchor="middle">7-bit</text>
+
+  <!-- arrow to XOR -->
+  <line class="arrow" x1="488" y1="46" x2="520" y2="100"/>
+  <line class="arrow" x1="488" y1="100" x2="520" y2="100"/>
+
+  <!-- XOR block -->
+  <rect class="box" x="522" y="84" width="56" height="32" rx="3"/>
+  <text class="label" x="550" y="105" text-anchor="middle">XOR</text>
+  <text class="note" x="550" y="132" text-anchor="middle">solution[i]</text>
+  <text class="note" x="550" y="144" text-anchor="middle">where bit set</text>
+
+  <!-- arrow to compare -->
+  <line class="arrow" x1="578" y1="100" x2="610" y2="100"/>
+  <line class="arrow" x1="488" y1="154" x2="610" y2="154"/>
+
+  <!-- compare -->
+  <rect class="box" x="612" y="84" width="56" height="84" rx="3"/>
+  <text class="label" x="640" y="116" text-anchor="middle">match</text>
+  <text class="label" x="640" y="132" text-anchor="middle">?</text>
+
+  <!-- result labels -->
+  <text class="note" x="640" y="188" text-anchor="middle">yes: found</text>
+  <text class="note" x="640" y="200" text-anchor="middle">(or check overflow)</text>
+  <text class="note" x="640" y="220" text-anchor="middle">no: not in set</text>
+</svg>
+
+<p>The filter file is divided into <strong>256 shards</strong> based on the first byte of the SHA-1 hash. Within each shard, the MurmurHash3 (x64, 128-bit) of the hex hash is computed using a seed from the file header. This produces three values:</p>
+
+<ul>
+<li><strong>start</strong> — index into the solution array</li>
+<li><strong>coefficient</strong> — a 64-bit bitmask selecting which solution rows to XOR (ribbon width = 64)</li>
+<li><strong>fingerprint</strong> — a 7-bit value to compare against</li>
+</ul>
+
+<p>The query XORs the solution entries at positions where the coefficient bits are set, starting from the start index. If the result matches the fingerprint, the key is considered present. A small number of keys that couldn't be inserted during construction ("bumped" keys) are stored in a per-shard overflow table and checked separately.</p>
+</section>
+
+<!-- Benchmarks -->
+<section>
+<h2>Benchmarks</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Metric</th><th>Value</th></tr>
+</thead>
+<tbody>
+<tr><td>HIBP passwords</td><td>2,048,908,128</td></tr>
+<tr><td>Filter size</td><td>1.79 GiB</td></tr>
+<tr><td>Fingerprint bits</td><td>7</td></tr>
+<tr><td>False positive rate</td><td>1/128 (~0.78%)</td></tr>
+<tr><td>False negatives</td><td>0</td></tr>
+<tr><td><code>check(password)</code></td><td>~14 µs</td></tr>
+<tr><td><code>checkHash(sha1hex)</code></td><td>~8 µs</td></tr>
+<tr><td>Throughput (single core)</td><td>~72k–121k/sec</td></tr>
+<tr><td>npm dependencies</td><td>0</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- Comparison with HIBP API -->
+<section>
+<h2>Comparison with HIBP API</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th></th><th>haveibeenfiltered</th><th>HIBP API</th></tr>
+</thead>
+<tbody>
+<tr><td>Privacy</td><td>Full — nothing leaves machine</td><td>k-anonymity (5-char SHA-1 prefix sent)</td></tr>
+<tr><td>Speed</td><td>~14 µs/check</td><td>~200 ms/request</td></tr>
+<tr><td>Offline</td><td>Yes</td><td>No</td></tr>
+<tr><td>Setup</td><td>1.79 GB download</td><td>None</td></tr>
+<tr><td>RAM</td><td>~1.8 GB</td><td>0</td></tr>
+<tr><td>False positives</td><td>~0.78%</td><td>0% (exact)</td></tr>
+<tr><td>Rate limits</td><td>None</td><td>Yes</td></tr>
+<tr><td>Data freshness</td><td>Static snapshot</td><td>Continuously updated</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- Downloads / CDN -->
+<section>
+<h2>Downloads</h2>
+
+<p>Filter binaries are hosted on Cloudflare R2 at <code>https://download.haveibeenfiltered.com/</code>.</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>File</th><th>Size</th><th>SHA-256</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>ribbon-hibp-v1.bin</code></td>
+  <td>1.79 GiB</td>
+  <td class="sha256">4eeb8608fa8541a51a952ecda91ad2f86e6f7457b0dbe34b88ba8a7ed33750ce</td>
+</tr>
+<tr>
+  <td><code>ribbon-rockyou-v1.bin</code></td>
+  <td>12.8 MB</td>
+  <td class="sha256">777d3c1640e7067bc7fb222488199c3371de5360639561f1f082db6b7c16a447</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>Integrity is verified via SHA-256 after download. The CLI handles downloading automatically:</p>
+<pre><code>npx haveibeenfiltered download</code></pre>
+</section>
+
+<!-- FAQ -->
+<section>
+<h2>FAQ</h2>
+
+<details>
+<summary>Can I use this in production?</summary>
+<p>Yes. The package has zero npm dependencies and uses only Node.js builtins (crypto, fs, path, https). The filter is loaded into memory once and all lookups are in-memory array operations. There is no network I/O during checks.</p>
+</details>
+
+<details>
+<summary>How often is the data updated?</summary>
+<p>The filter files are static snapshots. The current HIBP dataset was built from the Have I Been Pwned password list containing 2,048,908,128 passwords. Updated filter files will be released as new versions when the source data is updated.</p>
+</details>
+
+<details>
+<summary>What about false positives?</summary>
+<p>The filter uses 7-bit fingerprints, giving a theoretical false positive rate of 1/128 (~0.78%). This means roughly 1 in 128 passwords not in the breach dataset will incorrectly report as breached. There are zero false negatives — every breached password is always detected.</p>
+</details>
+
+<details>
+<summary>How much RAM does it need?</summary>
+<p>The filter is loaded entirely into memory. The HIBP dataset requires ~1.8 GB of RAM. The RockYou dataset requires ~13 MB. Memory is released when you call <code>filter.close()</code>.</p>
+</details>
+
+<details>
+<summary>Does it phone home?</summary>
+<p>No. All password checking is fully local. The only network request the package ever makes is downloading the filter file, and only when you explicitly run <code>npx haveibeenfiltered download</code> or opt in with <code>autoDownload: true</code>. Downloads use HTTPS only and refuse redirects.</p>
+</details>
+</section>
+
+</main>
+
+<!-- Footer -->
+<footer>
+<div style="max-width:720px;margin:0 auto;">
+<nav>
+  <span class="nav-links">
+    <a href="https://github.com/kolobus/haveibeenfiltered">GitHub</a>
+    <a href="https://www.npmjs.com/package/haveibeenfiltered">npm</a>
+  </span>
+  <a href="https://88x31.lol"><img src="https://88x31.lol/counter3.gif" alt="88x31 - Visitor counter" width="88" height="31"></a>
+</nav>
+<p>Created by <a href="https://github.com/kolobus">Mihail Fedorov</a>. MIT License.</p>
+<p>Data source: <a href="https://haveibeenpwned.com/">Have I Been Pwned</a> by Troy Hunt.</p>
+</div>
+</footer>
+</body>
+</html>

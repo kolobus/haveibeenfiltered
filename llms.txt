@@ -1,0 +1,88 @@
+# haveibeenfiltered
+
+Offline password breach checking using ribbon filters.
+
+## What it does
+
+haveibeenfiltered is an npm package that checks passwords against breach
+datasets locally. It compresses 2 billion SHA-1 hashes from Have I Been Pwned
+into a 1.79 GB ribbon filter file with a 0.78% false positive rate and zero
+false negatives. All checking is local — passwords never leave the machine.
+
+## Install
+
+    npm install haveibeenfiltered
+
+## Download the filter data
+
+    npx haveibeenfiltered download
+
+## API
+
+    const hbf = require('haveibeenfiltered')
+    const filter = await hbf.load()
+
+    filter.check('password123')       // true (breached)
+    filter.check('Tr0ub4dor&3')       // false (not found)
+
+    filter.checkHash('5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8')  // true
+
+    filter.meta     // { version, totalKeys, fpBits, numShards, ... }
+    filter.close()  // release memory
+
+### hbf.load(options?)
+
+Options:
+- dataset: 'hibp' (default) or 'rockyou'
+- path: explicit path to .bin file
+- autoDownload: false (default), set true to download if missing
+
+### filter.check(password)
+
+Check a plaintext password. Returns true if found in the breach dataset.
+
+### filter.checkHash(sha1hex)
+
+Check a pre-computed SHA-1 hash (hex string, case-insensitive).
+
+### filter.close()
+
+Releases the in-memory buffer.
+
+## CLI
+
+    npx haveibeenfiltered download              # download HIBP dataset
+    npx haveibeenfiltered download --dataset rockyou
+    npx haveibeenfiltered check password123      # check a password
+    npx haveibeenfiltered check --hash <sha1>    # check a hash
+    npx haveibeenfiltered check --stdin          # batch from stdin
+    npx haveibeenfiltered check --json           # JSON output
+    npx haveibeenfiltered status                 # show dataset info
+
+## Key facts
+
+- HIBP passwords: 2,048,908,128
+- Filter size: 1.79 GiB
+- False positive rate: 1/128 (~0.78%)
+- False negatives: 0
+- check(password): ~14 us (~72k/sec)
+- checkHash(sha1hex): ~8 us (~121k/sec)
+- npm dependencies: 0
+- Node.js >= 16 required
+- MIT license
+
+## How it works
+
+A ribbon filter is a probabilistic data structure (similar to Bloom filters
+but ~20% smaller). The filter file contains 256 shards based on the first
+byte of the SHA-1 hash. Within each shard, MurmurHash3 (x64, 128-bit) is
+used with a seed from the file header. The query XORs solution entries
+selected by a 64-bit coefficient bitmask and compares the result to a 7-bit
+fingerprint. Overflow entries handle keys bumped during construction.
+
+## Links
+
+- Website: https://haveibeenfiltered.com
+- GitHub: https://github.com/kolobus/haveibeenfiltered
+- npm: https://www.npmjs.com/package/haveibeenfiltered
+- Data source: https://haveibeenpwned.com
