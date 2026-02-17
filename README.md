@@ -6,7 +6,7 @@
 
 Offline password breach checking using [ribbon filters](https://engineering.fb.com/2021/07/09/core-infra/ribbon-filter/). Check passwords against the [Have I Been Pwned](https://haveibeenpwned.com/) dataset (2B+ passwords) locally, with no API calls.
 
-Built on data from [haveibeenfiltered.com](https://haveibeenfiltered.com).
+See [haveibeenfiltered.com](https://haveibeenfiltered.com) for more information about the project.
 
 ## Why?
 
@@ -191,6 +191,17 @@ npx haveibeenfiltered status
 |---------|-----------|-------------|---------|-------------|
 | `hibp` | 2,048,908,128 | 1.8 GB | ~0.78% | [Have I Been Pwned](https://haveibeenpwned.com/) full password list |
 | `rockyou` | 14,344,391 | 12.8 MB | ~0.78% | [RockYou](https://en.wikipedia.org/wiki/RockYou#Data_breach) breach (2009) |
+
+### CDN
+
+Filter binaries are hosted at `https://download.haveibeenfiltered.com/`:
+
+| File | Size | SHA-256 |
+|------|------|---------|
+| [`ribbon-hibp-v1.bin`](https://download.haveibeenfiltered.com/ribbon-hibp-v1.bin) | 1.8 GB | `4eeb8608fa8541a51a952ecda91ad2f86e6f7457b0dbe34b88ba8a7ed33750ce` |
+| [`ribbon-rockyou-v1.bin`](https://download.haveibeenfiltered.com/ribbon-rockyou-v1.bin) | 12.8 MB | `777d3c1640e7067bc7fb222488199c3371de5360639561f1f082db6b7c16a447` |
+
+The CLI downloads to `~/.haveibeenfiltered/` by default. Integrity is verified via SHA-256 after each download.
 
 ### False Positive Rate
 
