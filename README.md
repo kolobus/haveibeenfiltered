@@ -1,0 +1,243 @@
+# haveibeenfiltered
+
+[![npm version](https://img.shields.io/npm/v/haveibeenfiltered.svg)](https://www.npmjs.com/package/haveibeenfiltered)
+[![license](https://img.shields.io/npm/l/haveibeenfiltered.svg)](https://github.com/kolobus/haveibeenfiltered/blob/main/LICENSE)
+[![node](https://img.shields.io/node/v/haveibeenfiltered.svg)](https://nodejs.org)
+
+Offline password breach checking using [ribbon filters](https://engineering.fb.com/2021/07/09/core-infra/ribbon-filter/). Check passwords against the [Have I Been Pwned](https://haveibeenpwned.com/) dataset (2B+ passwords) locally, with no API calls.
+
+Built on data from [haveibeenfiltered.com](https://haveibeenfiltered.com).
+
+## Why?
+
+| Approach | Speed | Privacy | Offline | Size |
+|----------|-------|---------|---------|------|
+| HIBP API | ~200ms/req | Partial (k-anonymity) | No | 0 |
+| Full hash DB | Fast | Full | Yes | 30+ GB |
+| **haveibeenfiltered** | **~14 microseconds** | **Full** | **Yes** | **1.8 GB** |
+
+A ribbon filter compresses 2 billion SHA-1 hashes into 1.8 GB with a ~0.78% false positive rate and zero false negatives.
+
+## Quick Start
+
+### Install
+
+```bash
+npm install haveibeenfiltered
+```
+
+### Download the filter data
+
+```bash
+npx haveibeenfiltered download
+```
+
+This downloads the HIBP dataset (~1.8 GB) to `~/.haveibeenfiltered/` with SHA-256 integrity verification.
+
+For a smaller dataset to try first:
+
+```bash
+npx haveibeenfiltered download --dataset rockyou
+```
+
+### Use in your app
+
+```js
+const hbf = require('haveibeenfiltered')
+
+const filter = await hbf.load({ dataset: 'rockyou' })
+
+filter.check('password123')  // true  — breached!
+filter.check('Tr0ub4dor&3')  // false — not found
+```
+
+## API
+
+### `hbf.load(options?)`
+
+Loads a ribbon filter and returns a `RibbonFilter` instance.
+
+```js
+// Default dataset (HIBP)
+const filter = await hbf.load()
+
+// Specific dataset
+const filter = await hbf.load({ dataset: 'rockyou' })
+
+// Custom file path
+const filter = await hbf.load({ path: '/opt/data/ribbon-hibp-v1.bin' })
+
+// Auto-download if missing (opt-in)
+const filter = await hbf.load({ autoDownload: true })
+```
+
+**Options:**
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `dataset` | `string` | `'hibp'` | Dataset name (`hibp`, `rockyou`) |
+| `path` | `string` | — | Explicit path to `.bin` file |
+| `autoDownload` | `boolean` | `false` | Download from CDN if file is missing |
+
+**Path resolution order:**
+
+1. `opts.path` — explicit path
+2. `$HAVEIBEENFILTERED_PATH` — environment variable
+3. `~/.haveibeenfiltered/<filename>` — default directory
+
+### `filter.check(password)`
+
+Check a plaintext password. Returns `true` if found in the breach dataset.
+
+```js
+filter.check('password123')  // true
+filter.check('correcthorsebatterystaple')  // depends on dataset
+```
+
+### `filter.checkHash(sha1hex)`
+
+Check a pre-computed SHA-1 hash (hex string, case-insensitive).
+
+```js
+filter.checkHash('5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8')  // true ("password")
+filter.checkHash('5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8')  // also works
+```
+
+### `filter.meta`
+
+Returns filter metadata.
+
+```js
+filter.meta
+// {
+//   version: 1,
+//   totalKeys: 2048908128,
+//   fpBits: 7,
+//   numShards: 256,
+//   ...
+// }
+```
+
+### `filter.close()`
+
+Releases the in-memory buffer. Call when done.
+
+## CLI
+
+```bash
+npx haveibeenfiltered <command> [options]
+```
+
+### Download filter data
+
+```bash
+# Download HIBP dataset (~1.8 GB)
+npx haveibeenfiltered download
+
+# Download RockYou dataset (~13 MB)
+npx haveibeenfiltered download --dataset rockyou
+```
+
+### Check passwords
+
+```bash
+# Check a single password
+npx haveibeenfiltered check password123
+
+# Check multiple passwords
+npx haveibeenfiltered check password 123456 iloveyou
+
+# Check from stdin (batch mode)
+cat passwords.txt | npx haveibeenfiltered check --stdin
+
+# Check pre-computed SHA-1 hashes
+npx haveibeenfiltered check --hash 5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8
+
+# Batch hash checking
+cat sha1-hashes.txt | npx haveibeenfiltered check --stdin --hash
+```
+
+### Output formats
+
+```bash
+# Default: human-readable
+npx haveibeenfiltered check password123
+# password123: FOUND
+
+# JSON output
+npx haveibeenfiltered check password123 --json
+# {"input":"password123","found":true}
+
+# Quiet mode (exit code only — 1 if found, 0 if not)
+npx haveibeenfiltered check password123 --quiet && echo "safe" || echo "breached"
+```
+
+### Check status
+
+```bash
+npx haveibeenfiltered status
+# hibp: READY
+#   Path: /home/user/.haveibeenfiltered/ribbon-hibp-v1.bin
+#   Size: 1830.9 MB (1,918,974,105 bytes)
+#   Keys: 2,048,908,128
+#   Version: 1
+#   FP bits: 7
+#   Shards: 256
+```
+
+## Datasets
+
+| Dataset | Passwords | Filter Size | FP Rate | Description |
+|---------|-----------|-------------|---------|-------------|
+| `hibp` | 2,048,908,128 | 1.8 GB | ~0.78% | [Have I Been Pwned](https://haveibeenpwned.com/) full password list |
+| `rockyou` | 14,344,391 | 12.8 MB | ~0.78% | [RockYou](https://en.wikipedia.org/wiki/RockYou#Data_breach) breach (2009) |
+
+### False Positive Rate
+
+The filter uses 7-bit fingerprints, giving a theoretical false positive rate of 1/128 (~0.78%). This means:
+
+- Zero false negatives — every breached password is detected
+- ~0.78% of safe passwords will incorrectly report as breached
+
+## How It Works
+
+haveibeenfiltered uses [ribbon filters](https://engineering.fb.com/2021/07/09/core-infra/ribbon-filter/), a space-efficient probabilistic data structure (similar to Bloom filters but ~20% smaller).
+
+1. **Build** — All 2B+ password SHA-1 hashes are inserted into a ribbon filter, sharded by the first byte (256 shards)
+2. **Query** — Your password is SHA-1 hashed, then checked against the filter using MurmurHash3 for the internal lookup
+3. **Result** — `true` means definitely breached (or ~0.78% chance of false positive). `false` means definitely not in the dataset.
+
+The filter data is stored as a single binary file with a custom format (magic: `RBBN`), containing bit-packed solution vectors and overflow tables per shard.
+
+## Security
+
+- All checking is local — passwords never leave your machine
+- Downloads are SHA-256 verified
+- HTTPS only — redirects are refused
+- Zero npm dependencies — only Node.js builtins
+
+## Performance
+
+| Operation | Time | Throughput |
+|-----------|------|------------|
+| `check(password)` | ~14 us | ~72,000/sec |
+| `checkHash(sha1hex)` | ~8 us | ~121,000/sec |
+
+Benchmarked on a single core. The filter loads into memory once (~1.8 GB RAM for HIBP) and all subsequent lookups are in-memory.
+
+## Requirements
+
+- **Node.js** >= 16.0.0
+- **Disk space** — 1.8 GB for HIBP, 13 MB for RockYou
+- **RAM** — same as disk (filter is loaded into memory)
+
+## Links
+
+- [haveibeenfiltered.com](https://haveibeenfiltered.com) — Project homepage
+- [GitHub](https://github.com/kolobus/haveibeenfiltered) — Source code
+- [npm](https://www.npmjs.com/package/haveibeenfiltered) — Package registry
+- [Have I Been Pwned](https://haveibeenpwned.com/) — Password breach data source
+
+## License
+
+[MIT](LICENSE)

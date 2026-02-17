@@ -1,0 +1,45 @@
+{
+  "name": "haveibeenfiltered",
+  "version": "0.1.0",
+  "description": "Offline password breach checking using ribbon filters. Check passwords against HIBP (2B+ passwords) and other breach datasets locally, with zero API calls.",
+  "main": "lib/index.js",
+  "bin": {
+    "haveibeenfiltered": "bin/cli.js"
+  },
+  "files": [
+    "lib/",
+    "bin/",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "hibp",
+    "haveibeenpwned",
+    "password",
+    "breach",
+    "security",
+    "ribbon-filter",
+    "offline",
+    "password-check",
+    "pwned",
+    "data-breach",
+    "sha1",
+    "filter"
+  ],
+  "author": "Mihail Fedorov <mihail@fedorov.net>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kolobus/haveibeenfiltered.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kolobus/haveibeenfiltered/issues"
+  },
+  "homepage": "https://haveibeenfiltered.com",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
