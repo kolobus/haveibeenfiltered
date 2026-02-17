@@ -9,7 +9,7 @@ const { RibbonFilter } = require('../lib/filter');
 const { DATASETS } = require('../lib/datasets');
 const { download } = require('../lib/download');
 
-const BOOLEAN_FLAGS = new Set(['stdin', 'hash', 'json', 'quiet']);
+const BOOLEAN_FLAGS = new Set(['stdin', 'hash', 'json', 'quiet', 'force']);
 
 function parseArgs(argv) {
     const args = Object.create(null);
@@ -60,8 +60,12 @@ async function cmdDownload(args) {
     const filterPath = resolveFilterPath(args);
 
     if (fs.existsSync(filterPath)) {
-        console.log(ds.name + ' filter already exists at ' + filterPath);
-        return;
+        if (!args.force) {
+            console.log(ds.name + ' filter already exists at ' + filterPath);
+            console.log('Use --force to re-download.');
+            return;
+        }
+        fs.unlinkSync(filterPath);
     }
 
     console.log('Downloading ' + ds.name + ' filter...');
@@ -73,13 +77,13 @@ async function cmdDownload(args) {
     await download(ds.url, filterPath, {
         expectedBytes: ds.expectedBytes,
         sha256: ds.sha256,
-        onProgress: ({ downloaded, total, percent }) => {
+        onProgress: process.stderr.isTTY ? ({ downloaded, total, percent }) => {
             const mb = (downloaded / 1048576).toFixed(1);
             const totalMb = (total / 1048576).toFixed(1);
-            process.stdout.write('\r  ' + mb + ' / ' + totalMb + ' MB (' + percent + '%)');
-        },
+            process.stderr.write('\r  ' + mb + ' / ' + totalMb + ' MB (' + percent + '%)');
+        } : null,
     });
-    console.log('\nDone. Integrity verified.');
+    console.log((process.stderr.isTTY ? '\n' : '') + 'Done. Integrity verified.');
 }
 
 function cmdStatus(args) {
@@ -175,6 +179,7 @@ function usage() {
     console.log('Options:');
     console.log('  --dataset <name>   Dataset to use (hibp, rockyou). Default: hibp');
     console.log('  --path <path>      Custom path to filter file');
+    console.log('  --force            Re-download even if file exists (download command)');
     console.log('  --stdin            Read input from stdin (check command)');
     console.log('  --hash             Input is SHA-1 hex, not plaintext (check command)');
     console.log('  --json             Output results as JSON (check command)');

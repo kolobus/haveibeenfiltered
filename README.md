@@ -136,6 +136,9 @@ npx haveibeenfiltered download
 
 # Download RockYou dataset (~13 MB)
 npx haveibeenfiltered download --dataset rockyou
+
+# Re-download (overwrite existing file)
+npx haveibeenfiltered download --force
 ```
 
 ### Check passwords

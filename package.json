@@ -1,6 +1,6 @@
 {
   "name": "haveibeenfiltered",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Offline password breach checking using ribbon filters. Check passwords against HIBP (2B+ passwords) and other breach datasets locally, with zero API calls.",
   "main": "lib/index.js",
   "bin": {
