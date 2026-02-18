@@ -9,7 +9,7 @@ const { RibbonFilter } = require('../lib/filter');
 const { DATASETS } = require('../lib/datasets');
 const { download } = require('../lib/download');
 
-const BOOLEAN_FLAGS = new Set(['stdin', 'hash', 'json', 'quiet', 'force']);
+const BOOLEAN_FLAGS = new Set(['stdin', 'hash', 'json', 'quiet', 'force', 'help', 'version']);
 
 function parseArgs(argv) {
     const args = Object.create(null);
@@ -74,15 +74,34 @@ async function cmdDownload(args) {
     console.log('  Expected size: ' + (ds.expectedBytes / 1048576).toFixed(1) + ' MB');
     console.log('  SHA-256: ' + ds.sha256);
 
-    await download(ds.url, filterPath, {
-        expectedBytes: ds.expectedBytes,
-        sha256: ds.sha256,
-        onProgress: process.stderr.isTTY ? ({ downloaded, total, percent }) => {
-            const mb = (downloaded / 1048576).toFixed(1);
-            const totalMb = (total / 1048576).toFixed(1);
-            process.stderr.write('\r  ' + mb + ' / ' + totalMb + ' MB (' + percent + '%)');
-        } : null,
-    });
+    const tmpPath = filterPath + '.tmp';
+    const onSigint = () => {
+        process.stderr.write('\n');
+        try { fs.unlinkSync(tmpPath); } catch (_) {}
+        process.exit(130);
+    };
+    process.on('SIGINT', onSigint);
+
+    let lastReported = -1;
+    try {
+        await download(ds.url, filterPath, {
+            expectedBytes: ds.expectedBytes,
+            sha256: ds.sha256,
+            onProgress: process.stderr.isTTY ? ({ downloaded, total, percent }) => {
+                const mb = (downloaded / 1048576).toFixed(1);
+                const totalMb = (total / 1048576).toFixed(1);
+                process.stderr.write('\r  ' + mb + ' / ' + totalMb + ' MB (' + percent + '%)');
+            } : ({ downloaded, total, percent }) => {
+                const step = percent - (percent % 10);
+                if (step > lastReported) {
+                    lastReported = step;
+                    console.error('  ' + (downloaded / 1048576).toFixed(1) + ' / ' + (total / 1048576).toFixed(1) + ' MB (' + percent + '%)');
+                }
+            },
+        });
+    } finally {
+        process.removeListener('SIGINT', onSigint);
+    }
     console.log((process.stderr.isTTY ? '\n' : '') + 'Done. Integrity verified.');
 }
 
@@ -184,6 +203,8 @@ function usage() {
     console.log('  --hash             Input is SHA-1 hex, not plaintext (check command)');
     console.log('  --json             Output results as JSON (check command)');
     console.log('  --quiet            No output, exit code 1 if any found (check command)');
+    console.log('  --help             Show this help message');
+    console.log('  --version          Show version number');
     console.log('');
     console.log('Examples:');
     console.log('  npx haveibeenfiltered download --dataset rockyou');
@@ -198,6 +219,17 @@ function usage() {
 
 async function main() {
     const args = parseArgs(process.argv.slice(2));
+
+    if (args.version) {
+        const pkg = require('../package.json');
+        console.log(pkg.version);
+        return;
+    }
+    if (args.help) {
+        usage();
+        return;
+    }
+
     const command = args._.shift();
 
     switch (command) {

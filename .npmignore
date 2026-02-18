@@ -1,5 +1,13 @@
 .git
 .github
 .env
+.env.*
+.DS_Store
+*.log
+*.tgz
+coverage/
+.nyc_output/
 test.js
+CHANGELOG.md
 CONTRIBUTING.md
+SECURITY.md

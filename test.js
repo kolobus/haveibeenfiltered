@@ -66,6 +66,53 @@ if (!fs.existsSync(ROCKYOU_PATH)) {
     filter.close();
 }
 
+// ─── CLI ───
+
+const { execFileSync } = require('child_process');
+const CLI = path.join(__dirname, 'bin', 'cli.js');
+
+test('--version prints package version', () => {
+    const out = execFileSync(process.execPath, [CLI, '--version'], { encoding: 'utf8' });
+    const pkg = require('./package.json');
+    assert.strictEqual(out.trim(), pkg.version);
+});
+
+test('--help prints usage', () => {
+    const out = execFileSync(process.execPath, [CLI, '--help'], { encoding: 'utf8' });
+    assert.ok(out.includes('Usage:'));
+    assert.ok(out.includes('Commands:'));
+});
+
+test('--help exits 0', () => {
+    execFileSync(process.execPath, [CLI, '--help'], { encoding: 'utf8' });
+});
+
+test('no args shows usage and exits 0', () => {
+    const out = execFileSync(process.execPath, [CLI], { encoding: 'utf8' });
+    assert.ok(out.includes('Usage:'));
+});
+
+test('unknown command exits 1', () => {
+    assert.throws(
+        () => execFileSync(process.execPath, [CLI, 'badcommand'], { encoding: 'utf8', stdio: 'pipe' }),
+        (err) => err.status === 1
+    );
+});
+
+// ─── Module API ───
+
+test('module exports load function', () => {
+    const mod = require('.');
+    assert.strictEqual(typeof mod.load, 'function');
+    assert.strictEqual(Object.keys(mod).length, 1);
+});
+
+test('module does not expose CLI internals', () => {
+    const mod = require('.');
+    assert.strictEqual(mod.parseArgs, undefined);
+    assert.strictEqual(mod.usage, undefined);
+});
+
 // ─── load() ───
 
 const hbf = require('./lib/index');

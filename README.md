@@ -16,7 +16,7 @@ See [haveibeenfiltered.com](https://haveibeenfiltered.com) for more information 
 | Full hash DB | Fast | Full | Yes | 30+ GB |
 | **haveibeenfiltered** | **~14 microseconds** | **Full** | **Yes** | **1.8 GB** |
 
-A ribbon filter compresses 2 billion SHA-1 hashes into 1.8 GB with a ~0.78% false positive rate and zero false negatives.
+A ribbon filter compresses 2 billion SHA-1 hashes into 1.8 GB with a ~0.78% false positive rate and **zero false negatives**. Smaller filtered subsets are available for constrained environments.
 
 ## Quick Start
 
@@ -75,7 +75,7 @@ const filter = await hbf.load({ autoDownload: true })
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `dataset` | `string` | `'hibp'` | Dataset name (`hibp`, `rockyou`) |
+| `dataset` | `string` | `'hibp'` | Dataset name (`hibp`, `hibp-min5`, `hibp-min10`, `hibp-min20`, `rockyou`) |
 | `path` | `string` | — | Explicit path to `.bin` file |
 | `autoDownload` | `boolean` | `false` | Download from CDN if file is missing |
 
@@ -192,7 +192,10 @@ npx haveibeenfiltered status
 
 | Dataset | Passwords | Filter Size | FP Rate | Description |
 |---------|-----------|-------------|---------|-------------|
-| `hibp` | 2,048,908,128 | 1.8 GB | ~0.78% | [Have I Been Pwned](https://haveibeenpwned.com/) full password list |
+| `hibp` | 2,048,908,128 | 1.8 GB | ~0.78% | [Have I Been Pwned](https://haveibeenpwned.com/) — all passwords |
+| `hibp-min5` | 812,290,707 | 726 MB | ~0.78% | HIBP — passwords seen in 5+ breaches |
+| `hibp-min10` | 486,611,978 | 435 MB | ~0.78% | HIBP — passwords seen in 10+ breaches |
+| `hibp-min20` | 290,029,936 | 259 MB | ~0.78% | HIBP — passwords seen in 20+ breaches |
 | `rockyou` | 14,344,391 | 12.8 MB | ~0.78% | [RockYou](https://en.wikipedia.org/wiki/RockYou#Data_breach) breach (2009) |
 
 ### CDN
@@ -202,16 +205,21 @@ Filter binaries are hosted at `https://files.haveibeenfiltered.com/v0.1/`:
 | File | Size | SHA-256 |
 |------|------|---------|
 | [`ribbon-hibp-v1.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-hibp-v1.bin) | 1.8 GB | `4eeb8608fa8541a51a952ecda91ad2f86e6f7457b0dbe34b88ba8a7ed33750ce` |
+| [`ribbon-hibp-v1-min5.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-hibp-v1-min5.bin) | 726 MB | `4422f5659cb5fe39cf284b844328bfd3f7ab37fac0fe649b4cff216ffd2ac5da` |
+| [`ribbon-hibp-v1-min10.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-hibp-v1-min10.bin) | 435 MB | `8c71d6a3696d27bcf21a30ddcd67f7e290a71210800db86810ffb84a426fe93e` |
+| [`ribbon-hibp-v1-min20.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-hibp-v1-min20.bin) | 259 MB | `31a2c7942698fce74d95ce54dfb61f383ef1a33dce496b88c672e1ac07c71c43` |
 | [`ribbon-rockyou-v1.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-rockyou-v1.bin) | 12.8 MB | `777d3c1640e7067bc7fb222488199c3371de5360639561f1f082db6b7c16a447` |
 
 The CLI downloads to `~/.haveibeenfiltered/` by default. Integrity is verified via SHA-256 after each download.
 
-### False Positive Rate
+### False Positives and False Negatives
 
-The filter uses 7-bit fingerprints, giving a theoretical false positive rate of 1/128 (~0.78%). This means:
+A ribbon filter is a probabilistic data structure. It has two possible error types:
 
-- Zero false negatives — every breached password is detected
-- ~0.78% of safe passwords will incorrectly report as breached
+- **False positive (FP):** A safe password is incorrectly reported as breached. This can happen because the filter stores compressed fingerprints, not exact hashes. The filter uses 7-bit fingerprints, giving a rate of 1/128 (~0.78%).
+- **False negative (FN):** A breached password is missed and reported as safe. **This cannot happen.** If a password is in the dataset, the filter will always detect it.
+
+In practice this means: if `check()` returns `false`, the password is **definitely not** in the dataset. If it returns `true`, there is a ~0.78% chance it's a false alarm. For security applications this is the right tradeoff — you never miss a breached password.
 
 ## How It Works
 
@@ -242,7 +250,7 @@ Benchmarked on a single core. The filter loads into memory once (~1.8 GB RAM for
 ## Requirements
 
 - **Node.js** >= 16.0.0
-- **Disk space** — 1.8 GB for HIBP, 13 MB for RockYou
+- **Disk space** — 1.8 GB for HIBP (full), 726 MB (min5), 435 MB (min10), 259 MB (min20), 13 MB for RockYou
 - **RAM** — same as disk (filter is loaded into memory)
 
 ## Links
@@ -251,6 +259,7 @@ Benchmarked on a single core. The filter loads into memory once (~1.8 GB RAM for
 - [GitHub](https://github.com/kolobus/haveibeenfiltered) — Source code
 - [npm](https://www.npmjs.com/package/haveibeenfiltered) — Package registry
 - [Have I Been Pwned](https://haveibeenpwned.com/) — Password breach data source
+- [Buy Me a Coffee](https://buymeacoffee.com/kolobus) — Support the project
 
 ## License
 
