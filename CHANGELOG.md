@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.2] - 2026-02-18
+
+### Changed
+- Migrate CDN URL from `download.haveibeenfiltered.com` to `files.haveibeenfiltered.com/v0.1/`
+
 ## [0.1.1] - 2026-02-17
 
 ### Added

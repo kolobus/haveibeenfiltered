@@ -44,13 +44,6 @@ npm test
 3. Ensure `npm test` passes
 4. Submit your PR
 
-## Adding a New Dataset
-
-1. Build the ribbon filter `.bin` file
-2. Upload to CDN (`https://download.haveibeenfiltered.com/`)
-3. Compute SHA-256: `sha256sum your-filter.bin`
-4. Add entry to `lib/datasets.js`
-
 ## License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.

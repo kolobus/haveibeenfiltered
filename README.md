@@ -197,12 +197,12 @@ npx haveibeenfiltered status
 
 ### CDN
 
-Filter binaries are hosted at `https://download.haveibeenfiltered.com/`:
+Filter binaries are hosted at `https://files.haveibeenfiltered.com/v0.1/`:
 
 | File | Size | SHA-256 |
 |------|------|---------|
-| [`ribbon-hibp-v1.bin`](https://download.haveibeenfiltered.com/ribbon-hibp-v1.bin) | 1.8 GB | `4eeb8608fa8541a51a952ecda91ad2f86e6f7457b0dbe34b88ba8a7ed33750ce` |
-| [`ribbon-rockyou-v1.bin`](https://download.haveibeenfiltered.com/ribbon-rockyou-v1.bin) | 12.8 MB | `777d3c1640e7067bc7fb222488199c3371de5360639561f1f082db6b7c16a447` |
+| [`ribbon-hibp-v1.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-hibp-v1.bin) | 1.8 GB | `4eeb8608fa8541a51a952ecda91ad2f86e6f7457b0dbe34b88ba8a7ed33750ce` |
+| [`ribbon-rockyou-v1.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-rockyou-v1.bin) | 12.8 MB | `777d3c1640e7067bc7fb222488199c3371de5360639561f1f082db6b7c16a447` |
 
 The CLI downloads to `~/.haveibeenfiltered/` by default. Integrity is verified via SHA-256 after each download.
 
