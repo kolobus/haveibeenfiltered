@@ -588,6 +588,21 @@ filter.close()  // release memory when done</code></pre>
   <td class="sha256">4eeb8608fa8541a51a952ecda91ad2f86e6f7457b0dbe34b88ba8a7ed33750ce</td>
 </tr>
 <tr>
+  <td><code>ribbon-hibp-v1-min5.bin</code></td>
+  <td>726 MB</td>
+  <td class="sha256">4422f5659cb5fe39cf284b844328bfd3f7ab37fac0fe649b4cff216ffd2ac5da</td>
+</tr>
+<tr>
+  <td><code>ribbon-hibp-v1-min10.bin</code></td>
+  <td>435 MB</td>
+  <td class="sha256">8c71d6a3696d27bcf21a30ddcd67f7e290a71210800db86810ffb84a426fe93e</td>
+</tr>
+<tr>
+  <td><code>ribbon-hibp-v1-min20.bin</code></td>
+  <td>259 MB</td>
+  <td class="sha256">31a2c7942698fce74d95ce54dfb61f383ef1a33dce496b88c672e1ac07c71c43</td>
+</tr>
+<tr>
   <td><code>ribbon-rockyou-v1.bin</code></td>
   <td>12.8 MB</td>
   <td class="sha256">777d3c1640e7067bc7fb222488199c3371de5360639561f1f082db6b7c16a447</td>
@@ -598,6 +613,20 @@ filter.close()  // release memory when done</code></pre>
 
 <p>Integrity is verified via SHA-256 after download. The CLI handles downloading automatically:</p>
 <pre><code>npx haveibeenfiltered download</code></pre>
+</section>
+
+<!-- False Positives & False Negatives -->
+<section>
+<h2>False Positives &amp; False Negatives</h2>
+
+<p>A ribbon filter is a probabilistic data structure. It has two possible error types:</p>
+
+<ul>
+<li><strong>False positive (FP):</strong> A safe password is incorrectly reported as breached. This can happen because the filter stores compressed fingerprints, not exact hashes. The filter uses 7-bit fingerprints, giving a rate of 1/128 (~0.78%).</li>
+<li><strong>False negative (FN):</strong> A breached password is missed and reported as safe. <strong>This cannot happen.</strong> If a password is in the dataset, the filter will always detect it.</li>
+</ul>
+
+<p>In practice this means: if <code>check()</code> returns <code>false</code>, the password is <strong>definitely not</strong> in the dataset. If it returns <code>true</code>, there is a ~0.78% chance it's a false alarm. For security applications this is the right tradeoff — you never miss a breached password.</p>
 </section>
 
 <!-- FAQ -->
@@ -640,9 +669,8 @@ filter.close()  // release memory when done</code></pre>
     <a href="https://github.com/kolobus/haveibeenfiltered">GitHub</a>
     <a href="https://www.npmjs.com/package/haveibeenfiltered">npm</a>
   </span>
-  <a href="https://88x31.lol"><img src="https://88x31.lol/counter3.gif" alt="88x31 - Visitor counter" width="88" height="31"></a>
 </nav>
-<p>Created by <a href="https://github.com/kolobus">Mihail Fedorov</a>. MIT License.</p>
+<p>Created by <a href="https://fedorov.net">Mihail Fedorov</a>. MIT License.</p>
 <p>Data source: <a href="https://haveibeenpwned.com/">Have I Been Pwned</a> by Troy Hunt.</p>
 </div>
 </footer>
