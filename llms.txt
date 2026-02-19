@@ -33,7 +33,7 @@ false negatives. All checking is local — passwords never leave the machine.
 ### hbf.load(options?)
 
 Options:
-- dataset: 'hibp' (default) or 'rockyou'
+- dataset: 'hibp' (default), 'hibp-min5', 'hibp-min10', 'hibp-min20', or 'rockyou'
 - path: explicit path to .bin file
 - autoDownload: false (default), set true to download if missing
 
@@ -51,7 +51,8 @@ Releases the in-memory buffer.
 
 ## CLI
 
-    npx haveibeenfiltered download              # download HIBP dataset
+    npx haveibeenfiltered download              # download HIBP dataset (full)
+    npx haveibeenfiltered download --dataset hibp-min5   # 5+ breaches (726 MB)
     npx haveibeenfiltered download --dataset rockyou
     npx haveibeenfiltered check password123      # check a password
     npx haveibeenfiltered check --hash <sha1>    # check a hash
@@ -59,12 +60,26 @@ Releases the in-memory buffer.
     npx haveibeenfiltered check --json           # JSON output
     npx haveibeenfiltered status                 # show dataset info
 
+## Datasets
+
+- hibp: 2,048,908,128 passwords, 1.79 GiB — all HIBP passwords
+- hibp-min5: 812,290,707 passwords, 726 MB — seen in 5+ breaches
+- hibp-min10: 486,611,978 passwords, 435 MB — seen in 10+ breaches
+- hibp-min20: 290,029,936 passwords, 259 MB — seen in 20+ breaches
+- rockyou: 14,344,391 passwords, 12.8 MB — RockYou breach (2009)
+
+## False positives and false negatives
+
+- False positive (FP): a safe password is incorrectly reported as breached.
+  Rate: 1/128 (~0.78%) due to 7-bit fingerprints.
+- False negative (FN): a breached password is missed. This cannot happen.
+  If a password is in the dataset, the filter will always detect it.
+
+If check() returns false, the password is definitely not in the dataset.
+If it returns true, there is a ~0.78% chance it is a false alarm.
+
 ## Key facts
 
-- HIBP passwords: 2,048,908,128
-- Filter size: 1.79 GiB
-- False positive rate: 1/128 (~0.78%)
-- False negatives: 0
 - check(password): ~14 us (~72k/sec)
 - checkHash(sha1hex): ~8 us (~121k/sec)
 - npm dependencies: 0
