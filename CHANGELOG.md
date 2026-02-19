@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.4] - 2026-02-19
+
+### Fixed
+- `load()` accepts a string shorthand again (e.g. `load('rockyou')`)
+
 ## [0.1.3] - 2026-02-19
 
 ### Added
