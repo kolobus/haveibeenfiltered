@@ -75,7 +75,7 @@ const filter = await hbf.load({ autoDownload: true })
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `dataset` | `string` | `'hibp'` | Dataset name (`hibp`, `hibp-min5`, `hibp-min10`, `hibp-min20`, `rockyou`) |
+| `dataset` | `string` | `'hibp'` | Dataset name (`hibp`, `hibp-min5`, `hibp-min10`, `hibp-min20`, `rockyou`, `top1m`, `top10m`) |
 | `path` | `string` | — | Explicit path to `.bin` file |
 | `autoDownload` | `boolean` | `false` | Download from CDN if file is missing |
 
@@ -197,6 +197,8 @@ npx haveibeenfiltered status
 | `hibp-min10` | 486,611,978 | 435 MB | ~0.78% | HIBP — passwords seen in 10+ breaches |
 | `hibp-min20` | 290,029,936 | 259 MB | ~0.78% | HIBP — passwords seen in 20+ breaches |
 | `rockyou` | 14,344,391 | 12.8 MB | ~0.78% | [RockYou](https://en.wikipedia.org/wiki/RockYou#Data_breach) breach (2009) |
+| `top1m` | 1,000,000 | 0.9 MB | ~0.78% | Top 1M most common passwords |
+| `top10m` | 10,000,000 | 9.0 MB | ~0.78% | Top 10M most common passwords |
 
 ### CDN
 
@@ -209,6 +211,8 @@ Filter binaries are hosted at `https://files.haveibeenfiltered.com/v0.1/`:
 | [`ribbon-hibp-v1-min10.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-hibp-v1-min10.bin) | 435 MB | `8c71d6a3696d27bcf21a30ddcd67f7e290a71210800db86810ffb84a426fe93e` |
 | [`ribbon-hibp-v1-min20.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-hibp-v1-min20.bin) | 259 MB | `31a2c7942698fce74d95ce54dfb61f383ef1a33dce496b88c672e1ac07c71c43` |
 | [`ribbon-rockyou-v1.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-rockyou-v1.bin) | 12.8 MB | `777d3c1640e7067bc7fb222488199c3371de5360639561f1f082db6b7c16a447` |
+| [`ribbon-top1m-v1.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-top1m-v1.bin) | 0.9 MB | `44f03ee81d777b42ba96deabde394f8aca8b8ef99134e15121c4e0c3fb3547c1` |
+| [`ribbon-top10m-v1.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-top10m-v1.bin) | 9.0 MB | `bdc40e88abf427354d408d67e79a31f7e2987dac0f1130c4d30f396062a9cd96` |
 
 The CLI downloads to `~/.haveibeenfiltered/` by default. Integrity is verified via SHA-256 after each download.
 
@@ -250,7 +254,7 @@ Benchmarked on a single core. The filter loads into memory once (~1.8 GB RAM for
 ## Requirements
 
 - **Node.js** >= 16.0.0
-- **Disk space** — 1.8 GB for HIBP (full), 726 MB (min5), 435 MB (min10), 259 MB (min20), 13 MB for RockYou
+- **Disk space** — 1.8 GB for HIBP (full), 726 MB (min5), 435 MB (min10), 259 MB (min20), 13 MB for RockYou, 9 MB for top10m, 0.9 MB for top1m
 - **RAM** — same as disk (filter is loaded into memory)
 
 ## Links
@@ -259,6 +263,7 @@ Benchmarked on a single core. The filter loads into memory once (~1.8 GB RAM for
 - [GitHub](https://github.com/kolobus/haveibeenfiltered) — Source code
 - [npm](https://www.npmjs.com/package/haveibeenfiltered) — Package registry
 - [Have I Been Pwned](https://haveibeenpwned.com/) — Password breach data source
+- [Mihail Fedorov](https://fedorov.net) — Author
 - [Buy Me a Coffee](https://buymeacoffee.com/kolobus) — Support the project
 
 ## License

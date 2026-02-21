@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.5] - 2026-02-22
+
+### Added
+- New datasets: `top1m` (top 1M most common passwords, 0.9 MB) and `top10m` (top 10M most common passwords, 9.0 MB)
+- CLI help text now lists all available datasets with descriptions and sizes
+
 ## [0.1.4] - 2026-02-19
 
 ### Fixed

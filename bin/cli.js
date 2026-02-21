@@ -196,7 +196,14 @@ function usage() {
     console.log('  check      Check password(s) against the filter');
     console.log('');
     console.log('Options:');
-    console.log('  --dataset <name>   Dataset to use (hibp, rockyou). Default: hibp');
+    console.log('  --dataset <name>   Dataset to use. Default: hibp');
+    console.log('                     hibp        All HIBP passwords (1.79 GB, 2B keys)');
+    console.log('                     hibp-min5   HIBP count >= 5   (725 MB, 812M keys)');
+    console.log('                     hibp-min10  HIBP count >= 10  (435 MB, 487M keys)');
+    console.log('                     hibp-min20  HIBP count >= 20  (259 MB, 290M keys)');
+    console.log('                     rockyou     RockYou wordlist  (12.8 MB)');
+    console.log('                     top1m       Top 1M passwords  (0.9 MB)');
+    console.log('                     top10m      Top 10M passwords (9.0 MB)');
     console.log('  --path <path>      Custom path to filter file');
     console.log('  --force            Re-download even if file exists (download command)');
     console.log('  --stdin            Read input from stdin (check command)');
