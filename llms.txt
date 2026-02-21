@@ -33,7 +33,7 @@ false negatives. All checking is local — passwords never leave the machine.
 ### hbf.load(options?)
 
 Options:
-- dataset: 'hibp' (default), 'hibp-min5', 'hibp-min10', 'hibp-min20', or 'rockyou'
+- dataset: 'hibp' (default), 'hibp-min5', 'hibp-min10', 'hibp-min20', 'rockyou', 'top1m', or 'top10m'
 - path: explicit path to .bin file
 - autoDownload: false (default), set true to download if missing
 
@@ -67,6 +67,8 @@ Releases the in-memory buffer.
 - hibp-min10: 486,611,978 passwords, 435 MB — seen in 10+ breaches
 - hibp-min20: 290,029,936 passwords, 259 MB — seen in 20+ breaches
 - rockyou: 14,344,391 passwords, 12.8 MB — RockYou breach (2009)
+- top1m: 1,000,000 passwords, 0.9 MB — top 1M most common passwords
+- top10m: 10,000,000 passwords, 9.0 MB — top 10M most common passwords
 
 ## False positives and false negatives
 

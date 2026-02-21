@@ -607,6 +607,16 @@ filter.close()  // release memory when done</code></pre>
   <td>12.8 MB</td>
   <td class="sha256">777d3c1640e7067bc7fb222488199c3371de5360639561f1f082db6b7c16a447</td>
 </tr>
+<tr>
+  <td><code>ribbon-top1m-v1.bin</code></td>
+  <td>0.9 MB</td>
+  <td class="sha256">44f03ee81d777b42ba96deabde394f8aca8b8ef99134e15121c4e0c3fb3547c1</td>
+</tr>
+<tr>
+  <td><code>ribbon-top10m-v1.bin</code></td>
+  <td>9.0 MB</td>
+  <td class="sha256">bdc40e88abf427354d408d67e79a31f7e2987dac0f1130c4d30f396062a9cd96</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -650,7 +660,7 @@ filter.close()  // release memory when done</code></pre>
 
 <details>
 <summary>How much RAM does it need?</summary>
-<p>The filter is loaded entirely into memory. The HIBP dataset requires ~1.8 GB of RAM. The RockYou dataset requires ~13 MB. Memory is released when you call <code>filter.close()</code>.</p>
+<p>The filter is loaded entirely into memory. The HIBP dataset requires ~1.8 GB of RAM. Smaller datasets need less: top10m ~9 MB, top1m ~1 MB, RockYou ~13 MB. Memory is released when you call <code>filter.close()</code>.</p>
 </details>
 
 <details>
