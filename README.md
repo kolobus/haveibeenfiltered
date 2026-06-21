@@ -6,7 +6,7 @@
 
 Offline password breach checking using [ribbon filters](https://engineering.fb.com/2021/07/09/core-infra/ribbon-filter/). Check passwords against the [Have I Been Pwned](https://haveibeenpwned.com/) dataset (2B+ passwords) locally, with no API calls.
 
-See [haveibeenfiltered.com](https://haveibeenfiltered.com) for more information about the project.
+See [fedorov.net/projects/hibf](https://fedorov.net/projects/hibf/) for more information about the project.
 
 ## Why?
 
@@ -202,17 +202,17 @@ npx haveibeenfiltered status
 
 ### CDN
 
-Filter binaries are hosted at `https://files.haveibeenfiltered.com/v0.1/`:
+Filter binaries are hosted at `https://bits.fedorov.net/v0.1/`:
 
 | File | Size | SHA-256 |
 |------|------|---------|
-| [`ribbon-hibp-v1.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-hibp-v1.bin) | 1.8 GB | `4eeb8608fa8541a51a952ecda91ad2f86e6f7457b0dbe34b88ba8a7ed33750ce` |
-| [`ribbon-hibp-v1-min5.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-hibp-v1-min5.bin) | 726 MB | `4422f5659cb5fe39cf284b844328bfd3f7ab37fac0fe649b4cff216ffd2ac5da` |
-| [`ribbon-hibp-v1-min10.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-hibp-v1-min10.bin) | 435 MB | `8c71d6a3696d27bcf21a30ddcd67f7e290a71210800db86810ffb84a426fe93e` |
-| [`ribbon-hibp-v1-min20.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-hibp-v1-min20.bin) | 259 MB | `31a2c7942698fce74d95ce54dfb61f383ef1a33dce496b88c672e1ac07c71c43` |
-| [`ribbon-rockyou-v1.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-rockyou-v1.bin) | 12.8 MB | `777d3c1640e7067bc7fb222488199c3371de5360639561f1f082db6b7c16a447` |
-| [`ribbon-top1m-v1.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-top1m-v1.bin) | 0.9 MB | `44f03ee81d777b42ba96deabde394f8aca8b8ef99134e15121c4e0c3fb3547c1` |
-| [`ribbon-top10m-v1.bin`](https://files.haveibeenfiltered.com/v0.1/ribbon-top10m-v1.bin) | 9.0 MB | `bdc40e88abf427354d408d67e79a31f7e2987dac0f1130c4d30f396062a9cd96` |
+| [`ribbon-hibp-v1.bin`](https://bits.fedorov.net/v0.1/ribbon-hibp-v1.bin) | 1.8 GB | `4eeb8608fa8541a51a952ecda91ad2f86e6f7457b0dbe34b88ba8a7ed33750ce` |
+| [`ribbon-hibp-v1-min5.bin`](https://bits.fedorov.net/v0.1/ribbon-hibp-v1-min5.bin) | 726 MB | `4422f5659cb5fe39cf284b844328bfd3f7ab37fac0fe649b4cff216ffd2ac5da` |
+| [`ribbon-hibp-v1-min10.bin`](https://bits.fedorov.net/v0.1/ribbon-hibp-v1-min10.bin) | 435 MB | `8c71d6a3696d27bcf21a30ddcd67f7e290a71210800db86810ffb84a426fe93e` |
+| [`ribbon-hibp-v1-min20.bin`](https://bits.fedorov.net/v0.1/ribbon-hibp-v1-min20.bin) | 259 MB | `31a2c7942698fce74d95ce54dfb61f383ef1a33dce496b88c672e1ac07c71c43` |
+| [`ribbon-rockyou-v1.bin`](https://bits.fedorov.net/v0.1/ribbon-rockyou-v1.bin) | 12.8 MB | `777d3c1640e7067bc7fb222488199c3371de5360639561f1f082db6b7c16a447` |
+| [`ribbon-top1m-v1.bin`](https://bits.fedorov.net/v0.1/ribbon-top1m-v1.bin) | 0.9 MB | `44f03ee81d777b42ba96deabde394f8aca8b8ef99134e15121c4e0c3fb3547c1` |
+| [`ribbon-top10m-v1.bin`](https://bits.fedorov.net/v0.1/ribbon-top10m-v1.bin) | 9.0 MB | `bdc40e88abf427354d408d67e79a31f7e2987dac0f1130c4d30f396062a9cd96` |
 
 The CLI downloads to `~/.haveibeenfiltered/` by default. Integrity is verified via SHA-256 after each download.
 
@@ -259,7 +259,7 @@ Benchmarked on a single core. The filter loads into memory once (~1.8 GB RAM for
 
 ## Links
 
-- [haveibeenfiltered.com](https://haveibeenfiltered.com) — Project homepage
+- [fedorov.net/projects/hibf](https://fedorov.net/projects/hibf/) — Project homepage
 - [GitHub](https://github.com/kolobus/haveibeenfiltered) — Source code
 - [npm](https://www.npmjs.com/package/haveibeenfiltered) — Package registry
 - [Have I Been Pwned](https://haveibeenpwned.com/) — Password breach data source

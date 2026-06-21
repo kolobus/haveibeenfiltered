@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.6] - 2026-06-21
+
+### Changed
+- Migrate filter CDN URL from `files.haveibeenfiltered.com/v0.1/` to `bits.fedorov.net/v0.1/`
+- Project homepage moved to `https://fedorov.net/projects/hibf/`
+
 ## [0.1.5] - 2026-02-22
 
 ### Added
